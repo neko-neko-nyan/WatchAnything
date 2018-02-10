@@ -1,15 +1,17 @@
 // ==UserScript==
 // @name         WatchAnything
-// @namespace    https://github.com/pasha13666
+// @namespace    https://github.com/Pasha13666
 // @version      1.0.0
 // @description  [shikimori.org] Кнопка открытия случайного аниме из списка
-// @author       Pasha__kun
+// @author       Pasha13666
+// @homepageURL  https://github.com/Pasha13666/WatchAnything
+// @updateURL    https://openuserjs.org/meta/Pasha13666/WatchAnything.meta.js
 // @match        https://shikimori.org/*
 // @match        http://shikimori.org/*
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
 // @grant        none
 // @license      MIT
-// @copyright    2018, Pasha__kun (https://github.com/pasha13666)
+// @copyright    2018, Pasha__kun (https://github.com/Pasha13666)
 // ==/UserScript==
 
 var $ = jQuery.noConflict(true),
