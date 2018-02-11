@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WatchAnything
 // @namespace    https://github.com/Pasha13666
-// @version      1.0.0
+// @version      1.0.1
 // @description  [shikimori.org] Кнопка открытия случайного аниме из списка
 // @author       Pasha13666
 // @homepageURL  https://github.com/Pasha13666/WatchAnything
