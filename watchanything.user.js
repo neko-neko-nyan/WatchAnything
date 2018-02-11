@@ -15,7 +15,13 @@
 // ==/UserScript==
 
 var $ = jQuery.noConflict(true),
-    lUrl, lData, lKind;
+    lUrl, lData, lKind,
+    $doc = $(document);
+
+if (typeof jQuery === 'undefined'){
+    console.err('Maybe bug: Page\'s jquery inaccesable or not loaded!');
+    jQuery = $;
+}
 
 
 function parseUrl(){
@@ -74,13 +80,18 @@ function nameOf(i){
     }
 }
 
-function onCollapseClicked(){
-    var parent = $(this).parent(),
-        placeholder = parent.next().next(),
-        element = parent.parent().next(),
-        shown = !!$(this).html().match(/\u0441\u0432\u0435\u0440\u043d\u0443\u0442\u044c|\u0441\u043f\u0440\u044f\u0442\u0430\u0442\u044c|collapse|hide/);
+$.expr[':']['has-data'] = function(el, i, match) {
+        return $(el).data(match[3]) !== undefined;
+};
 
-    $(this).toggleClass("triggered", shown);
+$doc.on('click', '.collapse', function(){
+    var $this = $(this),
+        $parent = $this.parent(),
+        placeholder = $parent.next().next(),
+        element = $parent.parent().next(),
+        shown = !!$this.html().match(/\u0441\u0432\u0435\u0440\u043d\u0443\u0442\u044c|\u0441\u043f\u0440\u044f\u0442\u0430\u0442\u044c|collapse|hide/);
+
+    $this.toggleClass("triggered", shown);
 
     while (element.last().next().hasClass("collapse-merged"))
         element = element.add(n.last().next());
@@ -96,21 +107,17 @@ function onCollapseClicked(){
         placeholder.hide();
     }
 
-    $(this).html(function() {
-        var e = $(this);
-
-        return shown ? e.html().replace("\u0441\u0432\u0435\u0440\u043d\u0443\u0442\u044c", "\u0440\u0430\u0437\u0432\u0435\u0440\u043d\u0443\u0442\u044c")
+    $this.html(shown ? $this.html().replace("\u0441\u0432\u0435\u0440\u043d\u0443\u0442\u044c", "\u0440\u0430\u0437\u0432\u0435\u0440\u043d\u0443\u0442\u044c")
             .replace("\u0441\u043f\u0440\u044f\u0442\u0430\u0442\u044c", "\u043f\u043e\u043a\u0430\u0437\u0430\u0442\u044c")
             .replace("hide", "show")
             .replace("collapse", "expand")
-        : e.html()
+        : $this.html()
             .replace("\u0440\u0430\u0437\u0432\u0435\u0440\u043d\u0443\u0442\u044c", "\u0441\u0432\u0435\u0440\u043d\u0443\u0442\u044c")
             .replace("\u043f\u043e\u043a\u0430\u0437\u0430\u0442\u044c", "\u0441\u043f\u0440\u044f\u0442\u0430\u0442\u044c")
             .replace("show", "hide")
-            .replace("expand", "collapse");
-    });
+            .replace("expand", "collapse"));
 
-    var s = $(this).data("collapse-name") + ";",
+    var s = $this.data("collapse-name") + ";",
         i = jQuery.cookie("collapses") || "";
     if ((i.indexOf(s) === -1) === shown)
         jQuery.cookie("collapses", shown? i + s: i.replace(s, ""), {
@@ -119,10 +126,10 @@ function onCollapseClicked(){
         });
 
     return placeholder.next().trigger("show");
-}
+});
 
-function onRandomClicked(e){
-    var newTab = e.which === 2;
+$doc.on('click auxclick', '.open-random', function(e){
+    var newTab = e.which !== 1;
 
     parseUrl();
     getAll(lKind, lData, 1, $('[name=csrf-token]').attr('content'), $(this).data('list-name'), function(c){
@@ -134,7 +141,7 @@ function onRandomClicked(e){
     });
 
     if (newTab) return false;
-}
+});
 
 function start(){
     if (parseUrl() === undefined)
@@ -142,19 +149,31 @@ function start(){
 
     for (var i = 0; i < 5; i++){
         var it = $('.status-' + i + ' .b-options-floated');
+        if (it.hasClass('with-random'))
+            continue;
 
         it.parent().children(":last").click(function(){
             $(this).prev().prev().children(":last").click();
         });
 
-        $('<div/>').addClass('b-options-floated').append(
-            $('<a/>').text('Рандомное аниме').data('list-name', nameOf(i)).on('click auxclick', onRandomClicked)
+        $('<div/>').addClass('b-options-floated with-random').append(
+            $('<a/>').text('Рандомное аниме').data('list-name', nameOf(i)).addClass('open-random')
         ).append(
-            $('<a/>').text(it.children(":first").text()).data('list-name', i).data("collapse-name", i).click(onCollapseClicked)
+            $('<a/>').text(it.children(":first").text()).data("collapse-name", i).addClass('collapse')
         ).replaceAll(it);
     }
+
+    $('.collapse:has-data(collapse-name)').each(function(){
+        var $this = $(this),
+            shown = $this.parent().parent().next().css('display') !== 'none',
+            s = $this.data("collapse-name") + ";",
+            i = jQuery.cookie("collapses") || "";
+
+        if ((i.indexOf(s) === -1) !== shown)
+            $this.click();
+    });
 }
 
-$(document).ready(start);
-$(document).on('page:load', start);
-$(document).on('turbolinks:load', start);
+$doc.ready(start);
+jQuery(document).on('page:load turbolinks:load postloader:success', start);
+
