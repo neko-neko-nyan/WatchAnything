@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WatchAnything
 // @namespace    https://github.com/Pasha13666
-// @version      1.0.1
+// @version      1.0.2
 // @description  [shikimori.org] Кнопка открытия случайного аниме из списка
 // @author       Pasha13666
 // @homepageURL  https://github.com/Pasha13666/WatchAnything
@@ -9,7 +9,8 @@
 // @match        https://shikimori.org/*
 // @match        http://shikimori.org/*
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
-// @grant        none
+// @require      https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js
+// @grant        unsafeWindow
 // @license      MIT
 // @copyright    2018, Pasha__kun (https://github.com/Pasha13666)
 // ==/UserScript==
@@ -18,11 +19,9 @@ var $ = jQuery.noConflict(true),
     lUrl, lData, lKind,
     $doc = $(document);
 
-if (typeof jQuery === 'undefined'){
-    console.err('Maybe bug: Page\'s jquery inaccesable or not loaded!');
-    jQuery = $;
+if (window.jQuery === undefined){
+    window.jQuery = unsafeWindow.jQuery;
 }
-
 
 function parseUrl(){
     if (lUrl === window.location.pathname)
@@ -118,9 +117,9 @@ $doc.on('click', '.collapse', function(){
             .replace("expand", "collapse"));
 
     var s = $this.data("collapse-name") + ";",
-        i = jQuery.cookie("collapses") || "";
+        i = Cookies.get("collapses") || "";
     if ((i.indexOf(s) === -1) === shown)
-        jQuery.cookie("collapses", shown? i + s: i.replace(s, ""), {
+        Cookies.set("collapses", shown? i + s: i.replace(s, ""), {
             expires: 730,
             path: "/"
         });
@@ -167,7 +166,7 @@ function start(){
         var $this = $(this),
             shown = $this.parent().parent().next().css('display') !== 'none',
             s = $this.data("collapse-name") + ";",
-            i = jQuery.cookie("collapses") || "";
+            i = Cookies.get("collapses") || "";
 
         if ((i.indexOf(s) === -1) !== shown)
             $this.click();
@@ -175,5 +174,11 @@ function start(){
 }
 
 $doc.ready(start);
-jQuery(document).on('page:load turbolinks:load postloader:success', start);
+
+try {
+    jQuery(document).on('page:load turbolinks:load postloader:success', start);
+} catch(e){
+    alert('Невозможно запустить WatchAnything в Firefox. Удалите скрипт в панели GreaseMonkey.\nCant run WatchAnything in Firefox. Please, remove script from GreaseMonkey panel.');
+    console.error('Startup failed!', e);
+}
 
