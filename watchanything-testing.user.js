@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WatchAnything (testing)
 // @namespace    https://openuserjs.org/users/Pasha13666
-// @version      1.1.1
+// @version      1.1.2
 // @description  [shikimori.one] Кнопка открытия случайного аниме из списка
 // @author       NekoNekoNyan
 // @match        http://shikimori.one/*
@@ -108,11 +108,14 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
             return;
 
         const cnt = JSON.parse(ajax.responseText);
-        if (cnt.length === 50)
-            setTimeout(() => this.loadList(page + 1, mylist, function(c){
+        if (cnt.length === 50) {
+            if (page % 5 === 0) setTimeout(() => this.loadList(page + 1, mylist, function(c){
                 fn(cnt.concat(c));
-            }), 100);
-        else fn(cnt);
+            }), 1000);
+            else this.loadList(page + 1, mylist, function(c){
+                fn(cnt.concat(c));
+            });
+        } else fn(cnt);
     }
 
     ajax.send();
