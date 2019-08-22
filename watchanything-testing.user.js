@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WatchAnything (testing)
 // @namespace    https://openuserjs.org/users/Pasha13666
-// @version      1.1.0
+// @version      1.1.1
 // @description  [shikimori.one] Кнопка открытия случайного аниме из списка
 // @author       NekoNekoNyan
 // @match        http://shikimori.one/*
