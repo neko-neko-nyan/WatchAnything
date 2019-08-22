@@ -109,9 +109,9 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
 
         const cnt = JSON.parse(ajax.responseText);
         if (cnt.length === 50)
-            this.loadList(page + 1, mylist, function(c){
+            setTimeout(() => this.loadList(page + 1, mylist, function(c){
                 fn(cnt.concat(c));
-            });
+            }), 100);
         else fn(cnt);
     }
 
