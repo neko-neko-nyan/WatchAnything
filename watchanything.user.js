@@ -70,7 +70,7 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<span class="action">Рандом</span>';
+        $link.innerHTML = '<a href="#" class="action"> Рандом </a>';
         $link.dataset.listName = LIST_NAMES[i];
 
         $header.children[1].before($link);
@@ -78,11 +78,14 @@ WatchAnything.prototype.bindToLists = function (){
 }
 
 WatchAnything.prototype.onRandomClicked = function(e) {
-    if(e.path.length >= 2 && e.path[1].classList.contains('wa-link')) {
-        var newTab = e.which !== 1;
-        const $link = e.path[1];
+    if (e.button === 1)
+        e.preventDefault();
 
-        this.loadList(1, $link.dataset.listName, function(c){
+    const path = e.srcElement.parentElement;
+    if(path.classList.length >= 2 && path.classList.contains('wa-link')) {
+        const newTab = e.which !== 1;
+
+        this.loadList(1, path.dataset.listName, function(c){
             c = c[Math.floor(Math.random() * c.length)];
             GM_log("[WatchAnything] Opening random selected:", c.russian || c.name);
 
@@ -95,8 +98,8 @@ WatchAnything.prototype.onRandomClicked = function(e) {
 }
 
 WatchAnything.prototype.loadList = function(page, mylist, fn){
-    var ajax = new XMLHttpRequest();
-    var data = new Object(this.data);
+    const ajax = new XMLHttpRequest();
+    const data = new Object(this.data);
     data.page = page;
     data.mylist = mylist;
 
@@ -106,7 +109,7 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
     ajax.setRequestHeader('X-Userscript', 'WatchAnything');
 
     ajax.onreadystatechange = () => {
-        if (ajax.readyState != 4 || ajax.status != 200)
+        if (ajax.readyState !== 4 || ajax.status !== 200)
             return;
 
         const cnt = JSON.parse(ajax.responseText);
