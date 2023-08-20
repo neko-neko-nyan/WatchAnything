@@ -4,6 +4,8 @@
 // @version      1.1.2
 // @description  [shikimori.one] Кнопка открытия случайного аниме из списка
 // @author       Pasha13666
+// @match        http://shikimori.me/*
+// @match        https://shikimori.me/*
 // @match        http://shikimori.one/*
 // @match        https://shikimori.one/*
 // @match        http://shikimori.org/*
