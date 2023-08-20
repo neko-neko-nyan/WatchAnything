@@ -4,6 +4,8 @@
 // @version      1.1.2
 // @description  [shikimori.one] Кнопка открытия случайного аниме из списка
 // @author       Pasha13666
+// @match        http://shikimori.me/*
+// @match        https://shikimori.me/*
 // @match        http://shikimori.one/*
 // @match        https://shikimori.one/*
 // @match        http://shikimori.org/*
@@ -52,11 +54,6 @@ WatchAnything.prototype.onUrlChanged = function (){
     this.data.limit = 50;
 
     this.csrf = document.querySelector('meta[name=csrf-token]').content;
-
-    document.removeEventListener('click', this.onRandomClicked);
-    document.addEventListener('click', this.onRandomClicked);
-    document.removeEventListener('auxclick', this.onRandomClicked);
-    document.addEventListener('auxclick', this.onRandomClicked);
 }
 
 WatchAnything.prototype.bindToLists = function (){
@@ -68,17 +65,25 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<span class="action">Рандом</span>';
+        $link.innerHTML = '<a href="#" class="action rnd_button_action"> Рандом </a>';
         $link.dataset.listName = LIST_NAMES[i];
 
         $header.children[1].before($link);
+
+        const button = document.querySelector('.rnd_button_action');
+        button.removeEventListener('click', this.onRandomClicked);
+        button.addEventListener('click', this.onRandomClicked);
+        button.removeEventListener('auxclick', this.onRandomClicked);
+        button.addEventListener('auxclick', this.onRandomClicked);
     }
 }
 
 WatchAnything.prototype.onRandomClicked = function(e) {
-    if(e.path.length >= 2 && e.path[1].classList.contains('wa-link')) {
-        var newTab = e.which !== 1;
-        const $link = e.path[1];
+    e.preventDefault();
+
+    const $link = e.srcElement.parentElement;
+    if($link.classList.length >= 2 && $link.classList.contains('wa-link')) {
+        const newTab = e.which !== 1;
 
         this.loadList(1, $link.dataset.listName, function(c){
             c = c[Math.floor(Math.random() * c.length)];
@@ -93,8 +98,8 @@ WatchAnything.prototype.onRandomClicked = function(e) {
 }
 
 WatchAnything.prototype.loadList = function(page, mylist, fn){
-    var ajax = new XMLHttpRequest();
-    var data = new Object(this.data);
+    const ajax = new XMLHttpRequest();
+    const data = new Object(this.data);
     data.page = page;
     data.mylist = mylist;
 
@@ -104,7 +109,7 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
     ajax.setRequestHeader('X-Userscript', 'WatchAnything');
 
     ajax.onreadystatechange = () => {
-        if (ajax.readyState != 4 || ajax.status != 200)
+        if (ajax.readyState !== 4 || ajax.status !== 200)
             return;
 
         const cnt = JSON.parse(ajax.responseText);
