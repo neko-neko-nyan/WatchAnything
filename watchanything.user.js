@@ -54,11 +54,6 @@ WatchAnything.prototype.onUrlChanged = function (){
     this.data.limit = 50;
 
     this.csrf = document.querySelector('meta[name=csrf-token]').content;
-
-    document.removeEventListener('click', this.onRandomClicked);
-    document.addEventListener('click', this.onRandomClicked);
-    document.removeEventListener('auxclick', this.onRandomClicked);
-    document.addEventListener('auxclick', this.onRandomClicked);
 }
 
 WatchAnything.prototype.bindToLists = function (){
@@ -70,10 +65,16 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<a href="#" class="action"> Рандом </a>';
+        $link.innerHTML = '<a href="#" class="rnd_button_action"> Рандом </a>';
         $link.dataset.listName = LIST_NAMES[i];
 
         $header.children[1].before($link);
+
+        const button = document.querySelector('.rnd_button_action');
+        button.removeEventListener('click', this.onRandomClicked);
+        button.addEventListener('click', this.onRandomClicked);
+        button.removeEventListener('auxclick', this.onRandomClicked);
+        button.addEventListener('auxclick', this.onRandomClicked);
     }
 }
 
