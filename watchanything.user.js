@@ -78,14 +78,13 @@ WatchAnything.prototype.bindToLists = function (){
 }
 
 WatchAnything.prototype.onRandomClicked = function(e) {
-    if (e.button === 1)
-        e.preventDefault();
+    e.preventDefault();
 
-    const path = e.srcElement.parentElement;
-    if(path.classList.length >= 2 && path.classList.contains('wa-link')) {
+    const $link = e.srcElement.parentElement;
+    if($link.classList.length >= 2 && $link.classList.contains('wa-link')) {
         const newTab = e.which !== 1;
 
-        this.loadList(1, path.dataset.listName, function(c){
+        this.loadList(1, $link.dataset.listName, function(c){
             c = c[Math.floor(Math.random() * c.length)];
             GM_log("[WatchAnything] Opening random selected:", c.russian || c.name);
 
