@@ -65,7 +65,7 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<a href="#" class="rnd_button_action"> Рандом </a>';
+        $link.innerHTML = '<a href="#" class="action rnd_button_action"> Рандом </a>';
         $link.dataset.listName = LIST_NAMES[i];
 
         $header.children[1].before($link);
