@@ -76,7 +76,7 @@ WatchAnything.prototype.bindToLists = function (){
 
 WatchAnything.prototype.onRandomClicked = function(e) {
     const newTab = e.which !== 1;
-    const $link = e.path[1];
+    const $link = e.currentTarget;
 
     this.loadList(1, $link.dataset.listName, function(c){
         c = c[Math.floor(Math.random() * c.length)];
