@@ -65,7 +65,7 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<span class="action">рандом</span>';
+        $link.innerHTML = '<a href="#" class="action">рандом</a>';
         $link.dataset.listName = LIST_NAMES[i];
         $link.addEventListener('click', this.onRandomClicked);
         $link.addEventListener('auxclick', this.onRandomClicked);
@@ -77,6 +77,8 @@ WatchAnything.prototype.bindToLists = function (){
 WatchAnything.prototype.onRandomClicked = function(e) {
     const newTab = e.which !== 1;
     const $link = e.currentTarget;
+
+    e.preventDefault();
 
     this.loadList(1, $link.dataset.listName, function(c){
         c = c[Math.floor(Math.random() * c.length)];
