@@ -1,22 +1,24 @@
 // ==UserScript==
 // @name         WatchAnything
 // @namespace    https://openuserjs.org/users/Pasha13666
-// @version      1.1.2
+// @version      1.1.3
 // @description  [shikimori.one] Кнопка открытия случайного аниме из списка
-// @author       Pasha13666
+// @author       NekoNekoNyan
+// @match        http://shikimori.me/*
+// @match        https://shikimori.me/*
 // @match        http://shikimori.one/*
 // @match        https://shikimori.one/*
 // @match        http://shikimori.org/*
 // @match        https://shikimori.org/*
 // @updateURL    https://openuserjs.org/meta/Pasha13666/WatchAnything.meta.js
-// @homepageURL  https://github.com/Pasha13666/WatchAnything
+// @homepageURL  https://github.com/neko-neko-nyan/WatchAnything
 // @run-at       document-body
 // @license      MIT
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_log
-// @copyright    2018-2019, Pasha13666 (https://github.com/Pasha13666)
+// @copyright    2018-2023, NekoNekoNyan (https://github.com/neko-neko-nyan)
 // ==/UserScript==
 
 const LIST_NAMES = ['planned', 'watching', 'completed', 'on_hold', 'dropped'];
@@ -52,11 +54,6 @@ WatchAnything.prototype.onUrlChanged = function (){
     this.data.limit = 50;
 
     this.csrf = document.querySelector('meta[name=csrf-token]').content;
-
-    document.removeEventListener('click', this.onRandomClicked);
-    document.addEventListener('click', this.onRandomClicked);
-    document.removeEventListener('auxclick', this.onRandomClicked);
-    document.addEventListener('auxclick', this.onRandomClicked);
 }
 
 WatchAnything.prototype.bindToLists = function (){
@@ -68,33 +65,35 @@ WatchAnything.prototype.bindToLists = function (){
         const $link = document.createElement('div');
 
         $link.classList = "b-options-floated wa-link";
-        $link.innerHTML = '<span class="action">Рандом</span>';
+        $link.innerHTML = '<a href="#" class="action">рандом</a>';
         $link.dataset.listName = LIST_NAMES[i];
+        $link.addEventListener('click', this.onRandomClicked);
+        $link.addEventListener('auxclick', this.onRandomClicked);
 
         $header.children[1].before($link);
     }
 }
 
 WatchAnything.prototype.onRandomClicked = function(e) {
-    if(e.path.length >= 2 && e.path[1].classList.contains('wa-link')) {
-        var newTab = e.which !== 1;
-        const $link = e.path[1];
+    const newTab = e.which !== 1;
+    const $link = e.currentTarget;
 
-        this.loadList(1, $link.dataset.listName, function(c){
-            c = c[Math.floor(Math.random() * c.length)];
-            GM_log("[WatchAnything] Opening random selected:", c.russian || c.name);
+    e.preventDefault();
 
-            if (newTab) window.open(location.origin + c.url, '_blank', '');
-            else window.location.pathname = c.url;
-        });
+    this.loadList(1, $link.dataset.listName, function(c){
+        c = c[Math.floor(Math.random() * c.length)];
+        GM_log("[WatchAnything] Opening random selected:", c.russian || c.name);
 
-        if (newTab) e.stopImmediatePropagation();
-    }
+        if (newTab) window.open(location.origin + c.url, '_blank', '');
+        else window.location.pathname = c.url;
+    });
+
+    if (newTab) e.stopImmediatePropagation();
 }
 
 WatchAnything.prototype.loadList = function(page, mylist, fn){
-    var ajax = new XMLHttpRequest();
-    var data = new Object(this.data);
+    const ajax = new XMLHttpRequest();
+    const data = new Object(this.data);
     data.page = page;
     data.mylist = mylist;
 
@@ -104,7 +103,7 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
     ajax.setRequestHeader('X-Userscript', 'WatchAnything');
 
     ajax.onreadystatechange = () => {
-        if (ajax.readyState != 4 || ajax.status != 200)
+        if (ajax.readyState !== 4 || ajax.status !== 200)
             return;
 
         const cnt = JSON.parse(ajax.responseText);
@@ -121,7 +120,7 @@ WatchAnything.prototype.loadList = function(page, mylist, fn){
     ajax.send();
 }
 
-document.head.append(GM_addStyle("header>.b-options-floated { position: inherit; float: right; margin: auto 10px; }"));
+document.head.append(GM_addStyle(".wa-link { right: 90px; }"));
 const wa = new WatchAnything;
 
 document.addEventListener('ready', wa.triggerChange);
